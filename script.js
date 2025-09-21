@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelUpdateBotButton = document.getElementById('cancelUpdateBot');
     const botAvatar = document.getElementById('bot-avatar');
     const avatarUploadInput = document.getElementById('avatar-upload-input');
+    const deleteAvatarButton = document.getElementById('delete-avatar-button');
 
     const GROUPME_API_URL = 'https://api.groupme.com/v3';
     let currentBot = null;
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const userData = await response.json();
             const user = userData.response;
             accountName.textContent = user.name;
-            accountAvatar.src = user.image_url || '../Assets/Sample Avatar.png';
+            accountAvatar.src = user.image_url || 'Assets/account avatar.jpg';
         } catch (error) {
             console.error('Error fetching user:', error);
             accountName.textContent = 'Account';
@@ -114,8 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
             listItem.addEventListener('click', () => openBotDetails(bot));
 
             const avatar = document.createElement('img');
-            avatar.src = bot.avatar_url || '../Assets/Sample Avatar.png';
-            avatar.onerror = () => { avatar.src = '../Assets/Error Avatar.png'; };
+            avatar.src = bot.avatar_url || 'Assets/Sample Avatar.png';
+            avatar.onerror = () => { avatar.src = 'Assets/Error Avatar.png'; };
             avatar.alt = `${bot.name} avatar`;
 
             const botInfo = document.createElement('div');
@@ -138,7 +139,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const openBotDetails = async (bot) => {
         currentBot = bot;
-        botAvatar.src = bot.avatar_url || '../Assets/Sample Avatar.png';
+        botAvatar.src = bot.avatar_url || 'Assets/Sample Avatar.png';
+        botAvatar.onerror = () => { botAvatar.src = 'Assets/Error Avatar.png'; };
+
+        if (bot.avatar_url && bot.avatar_url !== '') {
+            deleteAvatarButton.classList.remove('hidden');
+        } else {
+            deleteAvatarButton.classList.add('hidden');
+        }
         botNameInput.value = bot.name;
         botIdDisplay.textContent = bot.bot_id;
         botCallbackInput.value = bot.callback_url || '';
@@ -160,6 +168,33 @@ document.addEventListener('DOMContentLoaded', () => {
         showBotDetailsPopup();
     };
 
+    const convertImageToJpegBlob = (imageFileOrBlob) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    canvas.toBlob((blob) => {
+                        if (blob) {
+                            resolve(blob);
+                        } else {
+                            reject(new Error('Canvas to Blob conversion failed.'));
+                        }
+                    }, 'image/jpeg', 0.9); // Convert to JPEG with 90% quality
+                };
+                img.onerror = (error) => reject(new Error('Image loading failed: ' + error.message));
+                img.src = event.target.result;
+            };
+            reader.onerror = (error) => reject(new Error('FileReader failed: ' + error.message));
+            reader.readAsDataURL(imageFileOrBlob);
+        });
+    };
+
     const uploadAvatar = async (file) => {
         const token = localStorage.getItem('groupmeAccessToken');
         if (!token) {
@@ -168,14 +203,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            const jpegBlob = await convertImageToJpegBlob(file);
+
             // The GroupMe image service endpoint
             const response = await fetch('https://image.groupme.com/pictures', {
                 method: 'POST',
                 headers: {
                     'X-Access-Token': token,
-                    'Content-Type': file.type
+                    'Content-Type': jpegBlob.type // Should be 'image/jpeg'
                 },
-                body: file
+                body: jpegBlob
             });
 
             if (!response.ok) {
@@ -232,57 +269,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const callbackUrl = botCallbackInput.value.trim();
         const avatarUrl = currentBot.avatar_url; // Use the potentially updated avatar_url
 
-        console.log('handleBotUpdate called. Current Bot:', currentBot);
-        console.log('New Group ID:', newGroupId);
-        console.log('Current Bot Group ID:', currentBot.group_id);
-
         // Check if the group has changed
         if (newGroupId !== currentBot.group_id) {
-            console.log('Group has changed. Initiating move process.');
             // --- Group has changed: Delete and recreate bot ---
             try {
                 let avatarBlobToUpload = null;
                 // 1. Fetch the current bot's avatar as a Blob if it exists
                 if (currentBot.avatar_url) {
-                    console.log('Attempting to fetch avatar from:', currentBot.avatar_url);
                     try {
                         avatarBlobToUpload = await fetchAvatarAsBlob(currentBot.avatar_url);
-                        console.log('Avatar Blob fetched:', avatarBlobToUpload);
                     } catch (avatarError) {
                         console.warn('Could not fetch avatar, proceeding without it for now:', avatarError);
                     }
                 }
 
                 // 2. Delete the old bot
-                console.log('Deleting old bot with ID:', currentBot.bot_id);
                 await deleteBot(currentBot.bot_id, token);
-                console.log('Old bot deleted.');
 
                 // 3. Create a new bot without the avatar initially
-                console.log('Creating new bot in group:', newGroupId);
                 const newBotResponse = await createBot(name, newGroupId, null, callbackUrl, token);
                 const newBotId = newBotResponse.response.bot.bot_id;
-                console.log('New bot created. Response:', newBotResponse);
-                console.log('New Bot ID:', newBotId);
 
                 // 4. If an avatar was fetched, upload it and update the new bot
                 if (avatarBlobToUpload && newBotId) {
-                    console.log('Avatar Blob exists and new Bot ID is available. Attempting to upload and update avatar.');
                     try {
                         const uploadedAvatarUrl = await uploadAvatarBlob(avatarBlobToUpload, token);
-                        console.log('Uploaded Avatar URL:', uploadedAvatarUrl);
                         if (uploadedAvatarUrl) {
-                            console.log('Updating new bot with avatar URL:', uploadedAvatarUrl);
                             await updateBotAvatar(newBotId, uploadedAvatarUrl, token);
-                            console.log('New bot avatar updated successfully.');
-                        } else {
-                            console.warn('Uploaded avatar URL is null or empty.');
                         }
                     } catch (uploadError) {
                         console.warn('Could not re-upload avatar for new bot:', uploadError);
                     }
-                } else {
-                    console.log('No avatar blob to upload or new bot ID is missing.');
                 }
 
                 alert('Bot successfully moved to the new group!');
@@ -298,14 +315,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else {
             // --- Group is the same: Just update details ---
-            console.log('Group is the same. Updating bot details.');
             try {
                 const botPayload = {
                     bot_id: currentBot.bot_id,
                     name: name,
-                    callback_url: callbackUrl,
                     avatar_url: avatarUrl
                 };
+                // Only include callback_url if it has changed or is being set
+                if (callbackUrl !== (currentBot.callback_url || '')) {
+                    botPayload.callback_url = callbackUrl;
+                }
 
                 const response = await fetch(`${GROUPME_API_URL}/bots/update`, {
                     method: 'POST',
@@ -378,7 +397,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // New function to fetch avatar as Blob
     const fetchAvatarAsBlob = async (avatarUrl) => {
         try {
-            const response = await fetch(avatarUrl);
+            // Prepend CORS proxy to the avatarUrl
+            const proxiedAvatarUrl = `https://corsproxy.io/?${encodeURIComponent(avatarUrl)}`;
+            const response = await fetch(proxiedAvatarUrl);
             if (!response.ok) {
                 throw new Error(`Failed to fetch avatar: ${response.statusText}`);
             }
@@ -397,13 +418,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            const jpegBlob = await convertImageToJpegBlob(avatarBlob);
+
             const response = await fetch('https://image.groupme.com/pictures', {
                 method: 'POST',
                 headers: {
                     'X-Access-Token': token,
-                    'Content-Type': avatarBlob.type
+                    'Content-Type': jpegBlob.type
                 },
-                body: avatarBlob
+                body: jpegBlob
             });
 
             if (!response.ok) {
@@ -421,6 +444,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const deleteBotAvatar = async () => {
+        if (!currentBot) return;
+
+        currentBot.avatar_url = ''; // Set avatar_url to empty string
+        botAvatar.src = 'Assets/Sample Avatar.png'; // Set to default placeholder
+        deleteAvatarButton.classList.add('hidden'); // Hide the delete button
+
+        // Persist the change by calling handleBotUpdate
+        // We need to simulate the event object for handleBotUpdate
+        await handleBotUpdate({ preventDefault: () => {} });
+    };
+
 
     // --- Event Listeners ---
     avatarUploadInput.addEventListener('change', (event) => {
@@ -434,6 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelTokenButton.addEventListener('click', hideTokenPopup);
     botDetailsForm.addEventListener('submit', handleBotUpdate);
     cancelUpdateBotButton.addEventListener('click', hideBotDetailsPopup);
+    deleteAvatarButton.addEventListener('click', deleteBotAvatar);
 
     // --- Initial Load ---
     loadToken();
