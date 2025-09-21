@@ -1,15 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const accessTokenInput = document.getElementById('accessToken');
     const saveTokenButton = document.getElementById('saveToken');
+    const cancelTokenButton = document.getElementById('cancelToken');
     const botList = document.getElementById('bot-list');
     const accountButton = document.getElementById('account-button');
     const accountName = document.getElementById('account-name');
     const accountAvatar = document.getElementById('account-avatar');
-    const popupContainer = document.getElementById('popup-container');
-    const cancelTokenButton = document.getElementById('cancelToken');
 
     // Bot Details Popup Elements
-    const botDetailsPopup = document.getElementById('bot-details-popup');
     const botDetailsForm = document.getElementById('bot-details-form');
     const botNameInput = document.getElementById('bot-name-input');
     const botIdDisplay = document.getElementById('bot-id-display');
@@ -23,12 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const GROUPME_API_URL = 'https://api.groupme.com/v3';
     let currentBot = null;
 
+    // Bootstrap Modal Instances
+    const accessTokenModal = new bootstrap.Modal(document.getElementById('accessTokenModal'));
+    const botDetailsModal = new bootstrap.Modal(document.getElementById('botDetailsModal'));
+
     // --- Popup Handling ---
-    const showTokenPopup = () => popupContainer.classList.remove('hidden');
-    const hideTokenPopup = () => popupContainer.classList.add('hidden');
-    const showBotDetailsPopup = () => botDetailsPopup.classList.remove('hidden');
+    const showTokenPopup = () => accessTokenModal.show();
+    const hideTokenPopup = () => accessTokenModal.hide();
+    const showBotDetailsPopup = () => botDetailsModal.show();
     const hideBotDetailsPopup = () => {
-        botDetailsPopup.classList.add('hidden');
+        botDetailsModal.hide();
         currentBot = null;
     };
 
@@ -66,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error fetching user:', error);
             accountName.textContent = 'Account';
-            accountAvatar.src = '../Assets/Error Avatar.png';
+            accountAvatar.src = 'Assets/Error Avatar.png';
             showTokenPopup(); // If user fetch fails, token is likely bad
         }
     };
@@ -88,10 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Bot Functions ---
     const fetchBots = async (token) => {
         if (!token) {
-            botList.innerHTML = '<li>Please save your access token to see your bots.</li>';
+            botList.innerHTML = '<div class="col text-center"><p class="text-muted">Please save your access token to see your bots.</p></div>';
             return;
         }
-        botList.innerHTML = '<li>Loading bots...</li>';
+        botList.innerHTML = '<div class="col text-center"><p class="text-muted">Loading bots...</p></div>';
         try {
             const response = await fetch(`${GROUPME_API_URL}/bots?token=${token}`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -99,47 +101,66 @@ document.addEventListener('DOMContentLoaded', () => {
             displayBots(botsData.response);
         } catch (error) {
             console.error('Error fetching bots:', error);
-            botList.innerHTML = '<li>Error fetching bots. Check your token and network connection.</li>';
+            botList.innerHTML = '<div class="col text-center"><p class="text-muted">Error fetching bots. Check your token and network connection.</p></div>';
         }
     };
 
     const displayBots = (bots) => {
         botList.innerHTML = '';
         if (bots.length === 0) {
-            botList.innerHTML = '<li>No bots found for this account.</li>';
+            const noBotsMessage = document.createElement('div');
+            noBotsMessage.classList.add('col', 'text-center');
+            noBotsMessage.innerHTML = '<p class="text-muted">No bots found for this account.</p>';
+            botList.appendChild(noBotsMessage);
             return;
         }
         bots.sort((a, b) => a.name.localeCompare(b.name));
         bots.forEach(bot => {
-            const listItem = document.createElement('li');
-            listItem.addEventListener('click', () => openBotDetails(bot));
+            const colDiv = document.createElement('div');
+            colDiv.classList.add('col');
+
+            const card = document.createElement('div');
+            card.classList.add('card', 'h-100', 'shadow-sm', 'bot-card');
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', () => openBotDetails(bot));
+
+            const avatarContainer = document.createElement('div');
+            avatarContainer.classList.add('d-flex', 'justify-content-center', 'pt-3');
 
             const avatar = document.createElement('img');
             avatar.src = bot.avatar_url || 'Assets/Sample Avatar.png';
             avatar.onerror = () => { avatar.src = 'Assets/Error Avatar.png'; };
             avatar.alt = `${bot.name} avatar`;
+            avatar.classList.add('rounded-circle');
+            avatar.style.width = '80px';
+            avatar.style.height = '80px';
+            avatar.style.objectFit = 'cover';
 
-            const botInfo = document.createElement('div');
-            botInfo.className = 'bot-info';
+            avatarContainer.appendChild(avatar);
 
-            const botName = document.createElement('div');
-            botName.className = 'bot-name';
+            const cardBody = document.createElement('div');
+            cardBody.classList.add('card-body', 'text-center');
+
+            const botName = document.createElement('h5');
+            botName.classList.add('card-title', 'fw-bold');
             botName.textContent = bot.name;
 
-            const groupName = document.createElement('div');
+            const groupName = document.createElement('p');
+            groupName.classList.add('card-text', 'text-muted', 'small');
             groupName.textContent = bot.group_name;
 
-            botInfo.appendChild(botName);
-            botInfo.appendChild(groupName);
-            listItem.appendChild(avatar);
-            listItem.appendChild(botInfo);
-            botList.appendChild(listItem);
+            cardBody.appendChild(botName);
+            cardBody.appendChild(groupName);
+            card.appendChild(avatarContainer);
+            card.appendChild(cardBody);
+            colDiv.appendChild(card);
+            botList.appendChild(colDiv);
         });
     };
 
     const openBotDetails = async (bot) => {
         currentBot = bot;
-        botAvatar.src = bot.avatar_url || 'Assets/Sample Avatar.png';
+        botAvatar.src = bot.avatar_url && bot.avatar_url !== '' ? bot.avatar_url : 'Assets/Sample Avatar.png';
         botAvatar.onerror = () => { botAvatar.src = 'Assets/Error Avatar.png'; };
 
         if (bot.avatar_url && bot.avatar_url !== '') {

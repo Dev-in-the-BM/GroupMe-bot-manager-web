@@ -4,67 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GroupMe Bot Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>GroupMe Bot Manager</h1>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">GroupMe Bot Manager</h1>
             <div id="account-container">
-                <button id="account-button">
-                    <img id="account-avatar" src="Assets/account avatar.jpg" alt="User Avatar">
+                <button id="account-button" class="btn btn-outline-primary d-flex align-items-center">
+                    <img id="account-avatar" src="Assets/account avatar.jpg" alt="User Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px;">
                     <span id="account-name">Account</span>
                 </button>
             </div>
         </div>
-        <div id="bot-list-container">
-            <h2>Your Bots</h2>
-            <ul id="bot-list"></ul>
+        <div id="bot-list-container" class="mt-4">
+            <h2 class="mb-3">Your Bots</h2>
+            <div id="bot-list" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"></div>
         </div>
     </div>
 
-    <div id="popup-container" class="hidden">
-        <div class="popup">
-            <h2>Enter Access Token</h2>
-            <p>Please enter your GroupMe access token to continue.</p>
-            <input type="password" id="accessToken" placeholder="Enter your token">
-            <div class="popup-buttons">
-                <button id="saveToken">Save</button>
-                <button id="cancelToken">Cancel</button>
+    <div class="modal fade" id="accessTokenModal" tabindex="-1" aria-labelledby="accessTokenModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="accessTokenModalLabel">Enter Access Token</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please enter your GroupMe access token to continue.</p>
+                    <input type="password" id="accessToken" class="form-control" placeholder="Enter your token">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelToken">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveToken">Save</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="bot-details-popup" class="hidden">
-        <div class="popup">
-            <h2>Bot Details</h2>
-            <form id="bot-details-form">
-                <div class="avatar-container">
-                    <img id="bot-avatar" src="" alt="Bot Avatar" class="bot-avatar-popup">
-                    <label for="avatar-upload-input" class="edit-avatar-label">✏️</label>
-                    <input type="file" id="avatar-upload-input" accept="image/*" style="display: none;">
-                    <button id="delete-avatar-button" class="delete-avatar-button hidden">🗑️</button>
+    <div class="modal fade" id="botDetailsModal" tabindex="-1" aria-labelledby="botDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="botDetailsModalLabel">Bot Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <label for="bot-name-input">Name:</label>
-                <input type="text" id="bot-name-input" required>
-
-                <label for="bot-id-display">Bot ID:</label>
-                <p id="bot-id-display"></p>
-
-                <label for="bot-group-select">Group:</label>
-                <select id="bot-group-select"></select>
-
-                <label for="bot-callback-input">Callback URL:</label>
-                <input type="url" id="bot-callback-input">
-
-                <div class="popup-buttons">
-                    <button type="submit" id="updateBot">Save</button>
-                    <button type="button" id="cancelUpdateBot">Cancel</button>
+                <div class="modal-body">
+                    <form id="bot-details-form">
+                        <div class="mb-3 text-center">
+                            <div class="avatar-container position-relative d-inline-block">
+                                <img id="bot-avatar" src="" alt="Bot Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                                <label for="avatar-upload-input" class="btn btn-sm btn-light position-absolute bottom-0 end-0 rounded-circle" style="transform: translate(25%, 25%);">✏️</label>
+                                <input type="file" id="avatar-upload-input" accept="image/*" style="display: none;">
+                                <button id="delete-avatar-button" class="btn btn-sm btn-danger position-absolute top-0 start-0 rounded-circle hidden" style="transform: translate(-25%, -25%);">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bot-name-input" class="form-label">Name:</label>
+                            <input type="text" id="bot-name-input" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bot-id-display" class="form-label">Bot ID:</label>
+                            <p id="bot-id-display" class="form-control-plaintext"></p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bot-group-select" class="form-label">Group:</label>
+                            <select id="bot-group-select" class="form-select"></select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bot-callback-input" class="form-label">Callback URL:</label>
+                            <input type="url" id="bot-callback-input" class="form-control">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelUpdateBot">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="updateBot">Save</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>
 </html>
