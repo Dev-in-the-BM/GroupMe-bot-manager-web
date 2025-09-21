@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroupMe Bot Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>GroupMe Bot Manager</h1>
+            <div id="account-container">
+                <button id="account-button">
+                    <img id="account-avatar" src="../Assets/Sample Avatar.png" alt="User Avatar">
+                    <span id="account-name">Account</span>
+                </button>
+            </div>
+        </div>
+        <div id="bot-list-container">
+            <h2>Your Bots</h2>
+            <ul id="bot-list"></ul>
+        </div>
+    </div>
+
+    <div id="popup-container" class="hidden">
+        <div class="popup">
+            <h2>Enter Access Token</h2>
+            <p>Please enter your GroupMe access token to continue.</p>
+            <input type="password" id="accessToken" placeholder="Enter your token">
+            <div class="popup-buttons">
+                <button id="saveToken">Save</button>
+                <button id="cancelToken">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bot-details-popup" class="hidden">
+        <div class="popup">
+            <h2>Bot Details</h2>
+            <form id="bot-details-form">
+                <div class="avatar-container">
+                    <img id="bot-avatar" src="" alt="Bot Avatar" class="bot-avatar-popup">
+                    <label for="avatar-upload-input" class="edit-avatar-label">✏️</label>
+                    <input type="file" id="avatar-upload-input" accept="image/*" style="display: none;">
+                </div>
+                <label for="bot-name-input">Name:</label>
+                <input type="text" id="bot-name-input" required>
+
+                <label for="bot-id-display">Bot ID:</label>
+                <p id="bot-id-display"></p>
+
+                <label for="bot-group-select">Group:</label>
+                <select id="bot-group-select"></select>
+
+                <label for="bot-callback-input">Callback URL:</label>
+                <input type="url" id="bot-callback-input">
+
+                <div class="popup-buttons">
+                    <button type="submit" id="updateBot">Save</button>
+                    <button type="button" id="cancelUpdateBot">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

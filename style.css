@@ -1,0 +1,248 @@
+body {
+    font-family: sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 900px;
+}
+
+h1 {
+    color: #1877f2;
+    margin: 0;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#account-container {
+    position: relative;
+}
+
+#account-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #f0f2f5;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+#account-button:hover {
+    background-color: #e0e2e5;
+}
+
+#account-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#account-name {
+    font-weight: bold;
+}
+
+#bot-list-container h2 {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+#bot-list {
+    list-style-type: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+#bot-list li {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s, transform 0.2s;
+    cursor: pointer;
+}
+
+#bot-list li:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+#bot-list li img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+    object-fit: cover;
+}
+
+#bot-list li .bot-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#bot-list li .bot-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+/* Popup Styles */
+#popup-container, #bot-details-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#popup-container.hidden, #bot-details-popup.hidden {
+    display: none;
+}
+
+.popup {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 400px;
+    text-align: left;
+}
+
+.popup h2 {
+    margin-top: 0;
+    color: #1877f2;
+    text-align: center;
+}
+
+.popup p {
+    margin-bottom: 20px;
+}
+
+.popup input, .popup select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Add this to include padding in the width */
+}
+
+#bot-details-form label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+#bot-details-form p {
+    background-color: #f0f2f5;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 0 0 15px 0;
+    word-wrap: break-word;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.popup-buttons button {
+    padding: 10px 20px;
+}
+
+#cancelToken, #cancelUpdateBot {
+    background-color: #ccc;
+    color: #333;
+}
+
+#cancelToken:hover, #cancelUpdateBot:hover {
+    background-color: #bbb;
+}
+
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #account-container {
+        align-self: flex-end;
+        margin-top: 10px;
+    }
+
+    #bot-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+#bot-details-form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Changed from center */
+}
+
+.bot-avatar-popup {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.avatar-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.edit-avatar-label {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
