@@ -48,45 +48,41 @@ body {
 }
 
 .edit-avatar-label {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: transparent;
     color: white;
-    padding: 5px;
+    padding: 4px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 16px;
-    line-height: 1;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transform: translate(25%, 25%); /* Adjust to position correctly */
 }
 
 .delete-avatar-button {
-    position: absolute;
-    top: 0;
-    left: 0; 
-    background-color: rgba(255, 0, 0, 0.6); 
+    background-color: transparent; 
     color: white;
     border: none;
     border-radius: 50%;
-    width: 30px; 
-    height: 30px;
+    width: 24px; 
+    height: 24px;
     cursor: pointer;
-    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10; 
-    transform: translate(-25%, -25%); /* Adjust to position correctly */
 }
 
 .delete-avatar-button:hover {
-    background-color: rgba(255, 0, 0, 0.8);
+    background-color: transparent;
 }
 
 .hidden {
     display: none !important;
+}
+
+.icon-offset-right {
+    right: -10px !important;
+    bottom: -10px !important;
 }

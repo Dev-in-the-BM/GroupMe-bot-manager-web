@@ -54,10 +54,12 @@
                     <form id="bot-details-form">
                         <div class="mb-3 text-center">
                             <div class="avatar-container position-relative d-inline-block">
-                                <img id="bot-avatar" src="" alt="Bot Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
-                                <label for="avatar-upload-input" class="btn btn-sm btn-light position-absolute bottom-0 end-0 rounded-circle" style="transform: translate(25%, 25%);">✏️</label>
+                                <img id="bot-avatar" src="" alt="Bot Avatar" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                <div class="position-absolute d-flex icon-offset-right">
+                                    <label for="avatar-upload-input" class="edit-avatar-label rounded-circle me-1"><img src="Assets/pencil.png" alt="Edit" style="width: 16px; height: 16px;"></label>
+                                    <button id="delete-avatar-button" class="delete-avatar-button rounded-circle hidden"><img src="Assets/trash.png" alt="Delete" style="width: 16px; height: 16px;"></button>
+                                </div>
                                 <input type="file" id="avatar-upload-input" accept="image/*" style="display: none;">
-                                <button id="delete-avatar-button" class="btn btn-sm btn-danger position-absolute top-0 start-0 rounded-circle hidden" style="transform: translate(-25%, -25%);">🗑️</button>
                             </div>
                         </div>
                         <div class="mb-3">
