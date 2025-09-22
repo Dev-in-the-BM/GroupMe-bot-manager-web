@@ -465,7 +465,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const deleteBotAvatar = async () => {
+    const deleteBotAvatar = async (event) => {
+        event.preventDefault(); // Prevent any default button behavior
         if (!currentBot) return;
 
         currentBot.avatar_url = ''; // Set avatar_url to empty string
@@ -490,7 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelTokenButton.addEventListener('click', hideTokenPopup);
     botDetailsForm.addEventListener('submit', handleBotUpdate);
     cancelUpdateBotButton.addEventListener('click', hideBotDetailsPopup);
-    deleteAvatarButton.addEventListener('click', deleteBotAvatar);
+    deleteAvatarButton.addEventListener('click', (event) => deleteBotAvatar(event));
 
     // --- Initial Load ---
     loadToken();

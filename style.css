@@ -58,11 +58,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .edit-avatar-label:hover {
     background-color: rgba(0, 0, 0, 0.1);
+    transform: scale(1.4);
 }
 
 .delete-avatar-button {
@@ -77,7 +78,7 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 10; 
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
     background-image: url('Assets/trash.png');
     background-size: 16px 16px;
     background-repeat: no-repeat;
@@ -86,6 +87,7 @@ body {
 
 .delete-avatar-button:hover {
     background-color: rgba(255, 0, 0, 0.2);
+    transform: scale(1.2);
 }
 
 .hidden {
